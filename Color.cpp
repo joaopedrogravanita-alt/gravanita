@@ -29,7 +29,7 @@ namespace svg
         {
             c = NAMES_TO_COLORS.at(str);
         }
-        return c;jhvnancoacnpasonvoanoanybsiuanpisuvunpu
+        return c;
             
     }
 }
