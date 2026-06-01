@@ -116,4 +116,5 @@ private:
         int width;
         int height;
 };
+}
 #endif
