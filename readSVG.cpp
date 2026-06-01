@@ -62,15 +62,50 @@ namespace svg
                 // Polígonos usam estritamente 'fill'
                 const char* fill_attr = child->Attribute("fill");
                 Color fill = fill_attr ? parse_color(fill_attr) : Color{0, 0, 0};
-                std::vector<Point> points = parse_points(child->Attribute("points"));
-                svg_elements.push_back(new Polygon(fill, points));
+                const char* pts_attr = child->Attribute("points");
+                if (pts_attr != nullptr)
+                {
+                    std::vector<Point> points;
+                    std::stringstream ss(pts_attr);
+                    std::string pair;
+                    
+                    while (ss >> pair)
+                    {
+                        size_t comma = pair.find(',');
+                        if (comma != std::string::npos)
+                        {
+                            int px = std::stoi(pair.substr(0, comma));
+                            int py = std::stoi(pair.substr(comma + 1));
+                            points.push_back({px, py});
+                        }
+                    }
+                    svg_elements.push_back(new Polygon(fill, points));
+                }
             }
             else if (name == "polyline")
             {
                 const char* stroke_attr = child->Attribute("stroke");
                 Color stroke = stroke_attr ? parse_color(stroke_attr) : Color{0, 0, 0};
-                std::vector<Point> points = parse_points(child->Attribute("points"));
-                svg_elements.push_back(new Polyline(stroke, points));
+                const char* pts_attr = child->Attribute("points");
+                if (pts_attr != nullptr)
+                {
+                    std::vector<Point> points;
+                    std::stringstream ss(pts_attr);
+                    std::string pair;
+                    
+                    // Extrai e converte os pares x,y separados por espaços ou quebras de linha
+                    while (ss >> pair)
+                    {
+                        size_t comma = pair.find(',');
+                        if (comma != std::string::npos)
+                        {
+                            int px = std::stoi(pair.substr(0, comma));
+                            int py = std::stoi(pair.substr(comma + 1));
+                            points.push_back({px, py});
+                        }
+                    }
+                    svg_elements.push_back(new Polyline(stroke, points));
+                }
             }
 
 
