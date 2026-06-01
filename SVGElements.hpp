@@ -38,5 +38,12 @@ namespace svg
         Point center;
         Point radius;
     };
-}
+
+class Circle : public Elipse 
+{
+public:
+    Circle( const Color &fill, const Point &center, const int &radius);
+};
+
+class Polyline : public 
 #endif
