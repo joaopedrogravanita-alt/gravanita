@@ -43,6 +43,11 @@ class Circle : public Elipse
 {
 public:
     Circle( const Color &fill, const Point &center, const int &radius);
+    void draw(PNGImage &img) const override;
+private:
+        Color fill;
+        Point center;
+        int radius;
 };
 //escrevemos:
 class Polyline : public SVGElement
@@ -53,7 +58,7 @@ public:
 
     void draw(PNGImage& img) const override;
 
-protected:
+private:
     Color stroke;
     std::vector<Point> points;
 };
@@ -64,6 +69,11 @@ public:
     Line(const Color& stroke,
          const Point& p1,
          const Point& p2);
+    void draw(PNGImage &img) const override;
+private:
+        Color stroke;
+        Point p1;
+        Point p2;
 };
 //escrevemos:
 class Polygon : public SVGElement
@@ -87,7 +97,7 @@ public:
 
     void draw(PNGImage& img) const override;
 
-protected:
+private:
     Color fill;
     std::vector<Point> points;
 };
@@ -99,5 +109,11 @@ public:
          const Point& topLeft,
          int width,
          int height);
+    void draw(PNGImage &img) const override;
+private:
+        Color fill;
+        Point top_left;
+        int width;
+        int height;
 };
 #endif
