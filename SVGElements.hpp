@@ -39,7 +39,7 @@ namespace svg
         Point radius;
     };
 //escrevemos:
-class Circle : public Elipse 
+class Circle : public SVGElement
 {
 public:
     Circle( const Color &fill, const Point &center, const int &radius);
