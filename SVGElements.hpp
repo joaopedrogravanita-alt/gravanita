@@ -38,6 +38,8 @@ namespace svg
         Point center;
         Point radius;
     };
+
+
 //escrevemos:
 class Circle : public SVGElement
 {
@@ -63,7 +65,7 @@ private:
     std::vector<Point> points;
 };
 //escrevemos:
-class Line : public Polyline
+class Line : public SVGElement
 {
 public:
     Line(const Color& stroke,
