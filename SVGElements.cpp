@@ -70,7 +70,7 @@ void Polygon::draw(PNGImage& img) const
 }
 //escrevemos:
 Rect::Rect(const Color& fill,
-           const Point& topLeft,
+           const Point& top_left,
            int width,
            int height): fill(fill), top_left(top_left), width(width), height(height) {}
 void Rect::draw(PNGImage &img) const
