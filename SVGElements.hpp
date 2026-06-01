@@ -97,7 +97,7 @@ class Rect : public SVGElement
 {
 public:
     Rect(const Color& fill,
-         const Point& topLeft,
+         const Point& top_left,
          int width,
          int height);
     void draw(PNGImage &img) const override;
