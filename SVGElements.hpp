@@ -77,19 +77,8 @@ private:
         Point p1;
         Point p2;
 };
-//escrevemos:
-class Polygon : public SVGElement
-{
-public:
-    Polygon(const Color& fill,
-            const std::vector<Point>& points);
 
-    void draw(PNGImage& img) const override;
 
-protected:
-    Color fill;
-    std::vector<Point> points;
-};
 //escrevemos:
 class Polygon : public SVGElement
 {
