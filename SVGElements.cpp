@@ -23,11 +23,12 @@ namespace svg
 Circle::Circle(const Color& fill,
                const Point& center,
                int radius)
-    : Ellipse(fill,
-              center,
-              Point{radius, radius})
-{
-}
+    : fill(fill), center(center), radius(radius)
+{}
+void Circle::draw(PNGImage &img) const
+    {
+        img.draw_ellipse(center, {radius, radius}, fill);
+    }
 //escrevemos:
 Polyline::Polyline(const Color& stroke,
                    const std::vector<Point>& points)
@@ -50,10 +51,11 @@ void Polyline::draw(PNGImage& img) const
 Line::Line(const Color& stroke,
            const Point& p1,
            const Point& p2)
-    : Polyline(stroke,
-               std::vector<Point>{p1,p2})
-{
-}
+    : stroke(stroke), p1(p1), p2(p2) {}
+void Line::draw(PNGImage &img) const
+    {
+        img.draw_line(p1, p2, stroke);
+    }
 //escrevemos:
 Polygon::Polygon(const Color& fill,
                  const std::vector<Point>& points)
