@@ -93,7 +93,7 @@ private:
     std::vector<Point> points;
 };
 //escrevemos:
-class Rect : public Polygon
+class Rect : public SVGElement
 {
 public:
     Rect(const Color& fill,
