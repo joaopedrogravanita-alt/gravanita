@@ -72,15 +72,17 @@ void Polygon::draw(PNGImage& img) const
 Rect::Rect(const Color& fill,
            const Point& topLeft,
            int width,
-           int height)
-    : Polygon(
-        fill,
-        std::vector<Point>{
-            topLeft,
-            Point{topLeft.x + width, topLeft.y},
-            Point{topLeft.x + width, topLeft.y + height},
-            Point{topLeft.x, topLeft.y + height}
-        })
-{
-}
+           int height): fill(fill), top_left(top_left), width(width), height(height) {}
+void Rect::draw(PNGImage &img) const
+    {
+        // Mapeia os 4 cantos do retângulo (ajustando as dimensões com -1 para os limites do varrimento)
+        std::vector<Point> pts = {
+            top_left,
+            {top_left.x + width - 1, top_left.y},
+            {top_left.x + width - 1, top_left.y + height - 1},
+            {top_left.x, top_left.y + height - 1}
+        };
+        img.draw_polygon(pts, fill);
+    }
+
 }
