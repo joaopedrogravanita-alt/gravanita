@@ -22,7 +22,7 @@ namespace svg
 //escrevemos:
 Circle::Circle(const Color& fill,
                const Point& center,
-               int radius)
+               const int& radius)
     : fill(fill), center(center), radius(radius)
 {}
 void Circle::draw(PNGImage &img) const
