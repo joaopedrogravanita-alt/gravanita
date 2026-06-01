@@ -2,6 +2,7 @@
 #include <iostream>
 #include "SVGElements.hpp"
 #include "external/tinyxml2/tinyxml2.h"
+#include <sstram>
 
 using namespace std;
 using namespace tinyxml2;
