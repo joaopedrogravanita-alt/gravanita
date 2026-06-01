@@ -44,7 +44,6 @@ class Circle : public Elipse
 public:
     Circle( const Color &fill, const Point &center, const int &radius);
 };
-
 //escrevemos:
 class Polyline : public SVGElement
 {
@@ -66,7 +65,6 @@ public:
          const Point& p1,
          const Point& p2);
 };
-
 //escrevemos:
 class Polygon : public SVGElement
 {
