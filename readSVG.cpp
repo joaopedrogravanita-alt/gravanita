@@ -22,6 +22,17 @@ namespace svg
         dimensions.y = xml_elem->IntAttribute("height");
         
         // TODO complete code -->
+        for (XMLElement *child = xml_elem->FirstChildElement(); child != nullptr; child = child->NextSiblingElement())
+        {
+            string name = child->Value();
+
+            
+
+
+
+        }
+
         
     }
+    
 }
