@@ -1,4 +1,5 @@
 #include "SVGElements.hpp"
+#include <sstream>
 
 namespace svg
 {
