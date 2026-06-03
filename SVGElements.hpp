@@ -118,5 +118,36 @@ private:
         int width;
         int height;
 };
+
+//escrevemos:
+class Group : public SVGElement {
+private:
+    // Vetor de ponteiros para a classe base (permite guardar qualquer forma ou subgrupo)
+    std::vector<SVGElement*> elements;
+
+public:
+    Group();
+    ~Group() override; // Destrutor crucial para limpar a memória
+
+    void draw(PNGImage& img) const override;
+    SVGElement* clone() const override;
+    
+    // Função auxiliar para adicionar elementos ao grupo
+    void addElement(SVGElement* elem);
+};
+
+
+// escrevemos:
+class Use : public SVGElement {
+private:
+    SVGElement* clonedElement; // Guarda a cópia do elemento original
+
+public:
+    Use(SVGElement* elem);
+    ~Use() override;
+
+    void draw(PNGImage& img) const override;
+    SVGElement* clone() const override;
+};
 }
 #endif
