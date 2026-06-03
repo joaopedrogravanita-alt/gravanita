@@ -130,91 +130,148 @@ namespace svg
                     svg_elements.push_back(new Polyline(stroke, points , transform, transform_origin)); //3
                 }
             }
-
-
-
-        }
-
-        
-    }
-using namespace tinyxml2;
-
-// Função auxiliar/recursiva para ler qualquer elemento SVG
-SVGElement* readElement(XMLElement* elem, std::map<std::string, SVGElement*>& idMap) {
-    std::string name = elem->Value();
-    SVGElement* svgElem = nullptr;
-
-    if (name == "circle") {
-        // ... (teu código atual para ler círculo) ...
-        // svgElem = new Circle(...);
-    }
-    else if (name == "rect") {
-        // ... (teu código atual para ler retângulo) ...
-    }
-    // ==========================================
-    // SE FOR UM GRUPO <g>
-    // ==========================================
-    else if (name == "g") {
-        Group* group = new Group();
-
-        // Ciclo para percorrer todos os nós filhos de <g>
-        for (XMLElement* child = elem->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()) {
-            SVGElement* childElem = readElement(child, idMap); // Chamada recursiva!
-            if (childElem != nullptr) {
-                group->addElement(childElem);
-            }
-        }
-        svgElem = group;
-    }
-    // ==========================================
-    // SE FOR UM USE <use>
-    // ==========================================
-    else if (name == "use") {
-        const char* hrefAttr = elem->Attribute("href");
-        if (hrefAttr != nullptr && hrefAttr[0] == '#') {
-            std::string targetId = hrefAttr + 1; // Ignora o caractere '#' para obter o ID limpo
-
-            // Procura o ID no nosso mapa
-            if (idMap.find(targetId) != idMap.end()) {
-                // Se encontrou, clona o elemento original
-                SVGElement* origin = idMap[targetId];
-                svgElem = new Use(origin->clone());
-            }
         }
     }
 
-    // SE O ELEMENTO LIDO TIVER UM ID, GUARDAMOS NO MAPA
-    if (svgElem != nullptr) {
-        const char* idAttr = elem->Attribute("id");
-        if (idAttr != nullptr) {
-            idMap[idAttr] = svgElem;
-        }
-        
-        // Aqui também vais ler os atributos comuns como o 'transform' do elemento atual
-        // readTransform(elem, svgElem); 
-    }
 
-    return svgElem;
-}
-
-// Esta é a função principal que a Makefile chama
-void readSVG(const std::string& filename, std::vector<SVGElement*>& rootElements) {
-    XMLDocument doc;
-    if (doc.LoadFile(filename.c_str()) != XML_SUCCESS) return;
-
-    XMLElement* svgRoot = doc.FirstChildElement("svg");
-    if (!svgRoot) return;
-
-    // Criamos o mapa de IDs aqui no início
-    std::map<std::string, SVGElement*> idMap;
-
-    // Percorre os elementos principais do SVG
-    for (XMLElement* elem = svgRoot->FirstChildElement(); elem != nullptr; elem = elem->NextSiblingElement()) {
-        SVGElement* svgElem = readElement(elem, idMap);
-        if (svgElem != nullptr) {
-            rootElements.push_back(svgElem);
-        }
-    }
-}
+    using namespace tinyxml2;
     
-}
+    // Função auxiliar para ler a string de pontos (usada em Polyline e Polygon)
+    std::vector<Point> parsePoints(const std::string& pointsStr) {
+        std::vector<Point> points;
+        std::string cleanStr = pointsStr;
+        // Substitui vírgulas por espaços para facilitar a extração com stringstream
+        for (char& c : cleanStr) {
+            if (c == ',') c = ' ';
+        }
+        std::stringstream ss(cleanStr);
+        int x, y;
+        while (ss >> x >> y) {
+            points.push_back({x, y});
+        }
+        return points;
+    }
+    
+    // Função auxiliar para ler o transform-origin (converte "X Y" para Point)
+    Point parseOrigin(const char* attrStr) {
+        if (!attrStr) return {0, 0};
+        std::stringstream ss(attrStr);
+        int x = 0, y = 0;
+        ss >> x >> y;
+        return {x, y};
+    }
+    
+    // Função auxiliar/recursiva para ler qualquer elemento SVG
+    SVGElement* readElement(XMLElement* elem, std::map<std::string, SVGElement*>& idMap) {
+        std::string name = elem->Value();
+        SVGElement* svgElem = nullptr;
+    
+        // Lendo os atributos de transformação comuns a todas as formas
+        std::string transform = elem->Attribute("transform") ? elem->Attribute("transform") : "";
+        Point transformOrigin = parseOrigin(elem->Attribute("transform-origin"));
+    
+        // 1. LEITURA DA ELLIPSE
+        if (name == "ellipse") {
+            Color fill = Color::parse(elem->Attribute("fill") ? elem->Attribute("fill") : "");
+            Point center = { elem->IntAttribute("cx"), elem->IntAttribute("cy") };
+            Point radius = { elem->IntAttribute("rx"), elem->IntAttribute("ry") };
+            svgElem = new Ellipse(fill, center, radius, transform, transformOrigin);
+        }
+        // 2. LEITURA DO CIRCLE
+        else if (name == "circle") {
+            Color fill = Color::parse(elem->Attribute("fill") ? elem->Attribute("fill") : "");
+            Point center = { elem->IntAttribute("cx"), elem->IntAttribute("cy") };
+            int r = elem->IntAttribute("r");
+            svgElem = new Circle(fill, center, r, transform, transformOrigin);
+        }
+        // 3. LEITURA DA POLYLINE
+        else if (name == "polyline") {
+            Color stroke = Color::parse(elem->Attribute("stroke") ? elem->Attribute("stroke") : "");
+            std::vector<Point> points = parsePoints(elem->Attribute("points") ? elem->Attribute("points") : "");
+            svgElem = new Polyline(stroke, points, transform, transformOrigin);
+        }
+        // 4. LEITURA DA LINE
+        else if (name == "line") {
+            Color stroke = Color::parse(elem->Attribute("stroke") ? elem->Attribute("stroke") : "");
+            Point p1 = { elem->IntAttribute("x1"), elem->IntAttribute("y1") };
+            Point p2 = { elem->IntAttribute("x2"), elem->IntAttribute("y2") };
+            svgElem = new Line(stroke, p1, p2, transform, transformOrigin);
+        }
+        // 5. LEITURA DO POLYGON
+        else if (name == "polygon") {
+            Color fill = Color::parse(elem->Attribute("fill") ? elem->Attribute("fill") : "");
+            std::vector<Point> points = parsePoints(elem->Attribute("points") ? elem->Attribute("points") : "");
+            svgElem = new Polygon(fill, points, transform, transformOrigin);
+        }
+        // 6. LEITURA DO RECT
+        else if (name == "rect") {
+            Color fill = Color::parse(elem->Attribute("fill") ? elem->Attribute("fill") : "");
+            Point top_left = { elem->IntAttribute("x"), elem->IntAttribute("y") };
+            int width = elem->IntAttribute("width");
+            int height = elem->IntAttribute("height");
+            svgElem = new Rect(fill, top_left, width, height, transform, transformOrigin);
+        }
+        // 7. LEITURA DO GRUPO <g>
+        else if (name == "g") {
+            Group* group = new Group(transform, transformOrigin);
+    
+            // Ciclo recursivo para colocar os elementos filhos dentro do grupo
+            for (XMLElement* child = elem->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()) {
+                SVGElement* childElem = readElement(child, idMap); 
+                if (childElem != nullptr) {
+                    group->addElement(childElem);
+                }
+            }
+            svgElem = group;
+        }
+        // 8. LEITURA DO DUPLICADO <use>
+        else if (name == "use") {
+            const char* hrefAttr = elem->Attribute("href");
+            if (hrefAttr != nullptr && hrefAttr[0] == '#') {
+                std::string targetId = hrefAttr + 1; // Remove o '#' para obter apenas o ID
+    
+                // Se o ID original existir no nosso mapa, fazemos um clone dele
+                if (idMap.find(targetId) != idMap.end()) {
+                    SVGElement* origin = idMap[targetId];
+                    svgElem = new Use(origin->clone(), transform, transformOrigin);
+                }
+            }
+        }
+    
+        // SE O ELEMENTO FOI CRIADO COM SUCESSO E TIVER UM ID, GUARDAMOS NO MAPA
+        if (svgElem != nullptr) {
+            const char* idAttr = elem->Attribute("id");
+            if (idAttr != nullptr) {
+                idMap[idAttr] = svgElem;
+            }
+        }
+    
+        return svgElem;
+    }
+    
+    // Função principal chamada pelo motor do projeto
+    void readSVG(const std::string &svg_file, Point &dimensions, std::vector<SVGElement *> &svg_elements) {
+        XMLDocument doc;
+        if (doc.LoadFile(svg_file.c_str()) != XML_SUCCESS) return;
+    
+        XMLElement* svgRoot = doc.FirstChildElement("svg");
+        if (!svgRoot) return;
+    
+        // Guarda o tamanho da imagem final na referência passadas por argumento
+        int width = svgRoot->IntAttribute("width");
+        int height = svgRoot->IntAttribute("height");
+        dimensions = { width, height };
+    
+        // Mapa para associar IDs textuais aos ponteiros correspondentes
+        std::map<std::string, SVGElement*> idMap;
+    
+        // Percorre os nós principais imediatamente abaixo do nó <svg>
+        for (XMLElement* elem = svgRoot->FirstChildElement(); elem != nullptr; elem = elem->NextSiblingElement()) {
+            SVGElement* svgElem = readElement(elem, idMap);
+            if (svgElem != nullptr) {
+                svg_elements.push_back(svgElem);
+            }
+        }
+    }
+
+} 
