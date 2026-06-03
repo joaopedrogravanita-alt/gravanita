@@ -5,6 +5,8 @@
 #include "Color.hpp"
 #include "Point.hpp"
 #include "PNGImage.hpp"
+#include <vector>
+#include <string>
 
 namespace svg
 {
@@ -12,7 +14,7 @@ namespace svg
     {
 
     public:
-        SVGElement();
+        SVGElement(const std::string &transform = "", const Point &origin = {0, 0});
         virtual ~SVGElement();
         virtual void draw(PNGImage &img) const = 0;
         
@@ -24,7 +26,7 @@ namespace svg
         Point apply_transforms(Point p) const;
         //3
     };
-    };
+    
 
     // Declaration of namespace functions
     // readSVG -> implement it in readSVG.cpp
