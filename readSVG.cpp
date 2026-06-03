@@ -2,7 +2,7 @@
 #include <iostream>
 #include "SVGElements.hpp"
 #include "external/tinyxml2/tinyxml2.h"
-#include <sstram>
+#include <sstream>
 
 using namespace std;
 using namespace tinyxml2;
@@ -57,7 +57,7 @@ namespace svg
                 Color fill = parse_color(child->Attribute("fill"));
                 Point center = { child->IntAttribute("cx"), child->IntAttribute("cy") };
                 int radius = child->IntAttribute("r");
-                svg_elements.push_back(new Circle(fill, center, radius, , transform, transform_origin));//3
+                svg_elements.push_back(new Circle(fill, center, radius, transform, transform_origin));//3
             }
             else if (name == "line")
             {
