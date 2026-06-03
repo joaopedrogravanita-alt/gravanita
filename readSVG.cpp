@@ -3,6 +3,10 @@
 #include "SVGElements.hpp"
 #include "external/tinyxml2/tinyxml2.h"
 #include <sstream>
+#include <map>
+#include <string>
+#include "SVGElements.hpp"
+#include "tinyxml2.h"
 
 using namespace std;
 using namespace tinyxml2;
@@ -133,5 +137,85 @@ namespace svg
 
         
     }
+BRUNO: VE ISTO AQUI
+using namespace tinyxml2;
+
+// Função auxiliar/recursiva para ler qualquer elemento SVG
+SVGElement* readElement(XMLElement* elem, std::map<std::string, SVGElement*>& idMap) {
+    std::string name = elem->Value();
+    SVGElement* svgElem = nullptr;
+
+    if (name == "circle") {
+        // ... (teu código atual para ler círculo) ...
+        // svgElem = new Circle(...);
+    }
+    else if (name == "rect") {
+        // ... (teu código atual para ler retângulo) ...
+    }
+    // ==========================================
+    // SE FOR UM GRUPO <g>
+    // ==========================================
+    else if (name == "g") {
+        Group* group = new Group();
+
+        // Ciclo para percorrer todos os nós filhos de <g>
+        for (XMLElement* child = elem->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()) {
+            SVGElement* childElem = readElement(child, idMap); // Chamada recursiva!
+            if (childElem != nullptr) {
+                group->addElement(childElem);
+            }
+        }
+        svgElem = group;
+    }
+    // ==========================================
+    // SE FOR UM USE <use>
+    // ==========================================
+    else if (name == "use") {
+        const char* hrefAttr = elem->Attribute("href");
+        if (hrefAttr != nullptr && hrefAttr[0] == '#') {
+            std::string targetId = hrefAttr + 1; // Ignora o caractere '#' para obter o ID limpo
+
+            // Procura o ID no nosso mapa
+            if (idMap.find(targetId) != idMap.end()) {
+                // Se encontrou, clona o elemento original
+                SVGElement* origin = idMap[targetId];
+                svgElem = new Use(origin->clone());
+            }
+        }
+    }
+
+    // SE O ELEMENTO LIDO TIVER UM ID, GUARDAMOS NO MAPA
+    if (svgElem != nullptr) {
+        const char* idAttr = elem->Attribute("id");
+        if (idAttr != nullptr) {
+            idMap[idAttr] = svgElem;
+        }
+        
+        // Aqui também vais ler os atributos comuns como o 'transform' do elemento atual
+        // readTransform(elem, svgElem); 
+    }
+
+    return svgElem;
+}
+
+// Esta é a função principal que a Makefile chama
+void readSVG(const std::string& filename, std::vector<SVGElement*>& rootElements) {
+    XMLDocument doc;
+    if (doc.LoadFile(filename.c_str()) != XML_SUCCESS) return;
+
+    XMLElement* svgRoot = doc.FirstChildElement("svg");
+    if (!svgRoot) return;
+
+    // Criamos o mapa de IDs aqui no início
+    std::map<std::string, SVGElement*> idMap;
+
+    // Percorre os elementos principais do SVG
+    for (XMLElement* elem = svgRoot->FirstChildElement(); elem != nullptr; elem = elem->NextSiblingElement()) {
+        SVGElement* svgElem = readElement(elem, idMap);
+        if (svgElem != nullptr) {
+            rootElements.push_back(svgElem);
+        }
+    }
+}
     
 }
