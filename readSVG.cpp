@@ -74,7 +74,7 @@ namespace svg
                 Point topLeft = { child->IntAttribute("x"), child->IntAttribute("y") };
                 int width = child->IntAttribute("width");
                 int height = child->IntAttribute("height");
-                svg_elements.push_back(new Rect(fill, topLeft, width, height, , transform, transform_origin)); //3
+                svg_elements.push_back(new Rect(fill, topLeft, width, height,  transform, transform_origin)); //3
             }
             else if (name == "polygon")
             {
