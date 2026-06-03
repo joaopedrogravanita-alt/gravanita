@@ -15,6 +15,15 @@ namespace svg
         SVGElement();
         virtual ~SVGElement();
         virtual void draw(PNGImage &img) const = 0;
+        
+        //3
+    protected:
+        std::string transform_cmd;
+        Point transform_origin;
+
+        Point apply_transforms(Point p) const;
+        //3
+    };
     };
 
     // Declaration of namespace functions
