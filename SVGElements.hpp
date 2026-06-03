@@ -118,10 +118,5 @@ private:
         int width;
         int height;
 };
-class Group {
-    public:
-    
-    
-};
 }
 #endif
