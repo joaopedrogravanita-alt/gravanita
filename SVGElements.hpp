@@ -8,148 +8,148 @@
 #include <vector>
 #include <string>
 
-namespace svg
-{
-    class SVGElement
-    {
+// namespace svg
+// {
+//     class SVGElement
+//     {
 
-    public:
-        SVGElement(const std::string &transform = "", const Point &origin = {0, 0});
-        virtual ~SVGElement();
-        virtual void draw(PNGImage &img) const = 0;
+//     public:
+//         SVGElement(const std::string &transform = "", const Point &origin = {0, 0});
+//         virtual ~SVGElement();
+//         virtual void draw(PNGImage &img) const = 0;
         
-        //3
-    protected:
-        std::string transform_;
-        Point transform_origin;
+//         //3
+//     protected:
+//         std::string transform_;
+//         Point transform_origin;
 
-        Point apply_transforms(Point p) const;
-        //3
-    };
+//         Point apply_transforms(Point p) const;
+//         //3
+//     };
     
 
-    // Declaration of namespace functions
-    // readSVG -> implement it in readSVG.cpp
-    // convert -> already given (DO NOT CHANGE) in convert.cpp
+//     // Declaration of namespace functions
+//     // readSVG -> implement it in readSVG.cpp
+//     // convert -> already given (DO NOT CHANGE) in convert.cpp
 
-    void readSVG(const std::string &svg_file,
-                 Point &dimensions,
-                 std::vector<SVGElement *> &svg_elements);
-    void convert(const std::string &svg_file,
-                 const std::string &png_file);
+//     void readSVG(const std::string &svg_file,
+//                  Point &dimensions,
+//                  std::vector<SVGElement *> &svg_elements);
+//     void convert(const std::string &svg_file,
+//                  const std::string &png_file);
 
-    class Ellipse : public SVGElement
-    {
-    public:
-        Ellipse(const Color &fill, const Point &center, const Point &radius, const std::string &transform = "", const Point &origin = {0, 0});
-        void draw(PNGImage &img) const override;
+//     class Ellipse : public SVGElement
+//     {
+//     public:
+//         Ellipse(const Color &fill, const Point &center, const Point &radius, const std::string &transform = "", const Point &origin = {0, 0});
+//         void draw(PNGImage &img) const override;
 
-    private:
-        Color fill;
-        Point center;
-        Point radius;
-    };
-
-
-//escrevemos:
-class Circle : public SVGElement
-{
-public:
-    Circle( const Color &fill, const Point &center, const int &radius, const std::string &transform = "", const Point &origin = {0, 0});
-    void draw(PNGImage &img) const override;
-private:
-        Color fill;
-        Point center;
-        int radius;
-};
-//escrevemos:
-class Polyline : public SVGElement
-{
-public:
-    Polyline(const Color& stroke,
-             const std::vector<Point>& points, const std::string &transform = "", const Point &origin = {0, 0});
-
-    void draw(PNGImage& img) const override;
-
-private:
-    Color stroke;
-    std::vector<Point> points;
-};
-//escrevemos:
-class Line : public SVGElement
-{
-public:
-    Line(const Color& stroke,
-         const Point& p1,
-         const Point& p2, const std::string &transform = "", const Point &origin = {0, 0});
-    void draw(PNGImage &img) const override;
-private:
-        Color stroke;
-        Point p1;
-        Point p2;
-};
+//     private:
+//         Color fill;
+//         Point center;
+//         Point radius;
+//     };
 
 
-//escrevemos:
-class Polygon : public SVGElement
-{
-public:
-    Polygon(const Color& fill,
-            const std::vector<Point>& points, const std::string &transform = "", const Point &origin = {0, 0});
+// //escrevemos:
+// class Circle : public SVGElement
+// {
+// public:
+//     Circle( const Color &fill, const Point &center, const int &radius, const std::string &transform = "", const Point &origin = {0, 0});
+//     void draw(PNGImage &img) const override;
+// private:
+//         Color fill;
+//         Point center;
+//         int radius;
+// };
+// //escrevemos:
+// class Polyline : public SVGElement
+// {
+// public:
+//     Polyline(const Color& stroke,
+//              const std::vector<Point>& points, const std::string &transform = "", const Point &origin = {0, 0});
 
-    void draw(PNGImage& img) const override;
+//     void draw(PNGImage& img) const override;
 
-private:
-    Color fill;
-    std::vector<Point> points;
-};
-//escrevemos:
-class Rect : public SVGElement
-{
-public:
-    Rect(const Color& fill,
-         const Point& top_left,
-         int width,
-         int height, const std::string &transform = "", const Point &origin = {0, 0});
-    void draw(PNGImage &img) const override;
-private:
-        Color fill;
-        Point top_left;
-        int width;
-        int height;
-};
+// private:
+//     Color stroke;
+//     std::vector<Point> points;
+// };
+// //escrevemos:
+// class Line : public SVGElement
+// {
+// public:
+//     Line(const Color& stroke,
+//          const Point& p1,
+//          const Point& p2, const std::string &transform = "", const Point &origin = {0, 0});
+//     void draw(PNGImage &img) const override;
+// private:
+//         Color stroke;
+//         Point p1;
+//         Point p2;
+// };
 
-//escrevemos:
-class Group : public SVGElement {
-private:
-    // Vetor de ponteiros para a classe base (permite guardar qualquer forma ou subgrupo)
-    std::vector<SVGElement*> elements;
 
-public:
-    Group();
-    ~Group() override; // Destrutor crucial para limpar a memória
+// //escrevemos:
+// class Polygon : public SVGElement
+// {
+// public:
+//     Polygon(const Color& fill,
+//             const std::vector<Point>& points, const std::string &transform = "", const Point &origin = {0, 0});
 
-    void draw(PNGImage& img) const override;
-    SVGElement* clone() const override;
+//     void draw(PNGImage& img) const override;
+
+// private:
+//     Color fill;
+//     std::vector<Point> points;
+// };
+// //escrevemos:
+// class Rect : public SVGElement
+// {
+// public:
+//     Rect(const Color& fill,
+//          const Point& top_left,
+//          int width,
+//          int height, const std::string &transform = "", const Point &origin = {0, 0});
+//     void draw(PNGImage &img) const override;
+// private:
+//         Color fill;
+//         Point top_left;
+//         int width;
+//         int height;
+// };
+
+// //escrevemos:
+// class Group : public SVGElement {
+// private:
+//     // Vetor de ponteiros para a classe base (permite guardar qualquer forma ou subgrupo)
+//     std::vector<SVGElement*> elements;
+
+// public:
+//     Group();
+//     ~Group() override; // Destrutor crucial para limpar a memória
+
+//     void draw(PNGImage& img) const override;
+//     SVGElement* clone() const override;
     
-    // Função auxiliar para adicionar elementos ao grupo
-    void addElement(SVGElement* elem);
-};
+//     // Função auxiliar para adicionar elementos ao grupo
+//     void addElement(SVGElement* elem);
+// };
 
 
-// escrevemos:
-class Use : public SVGElement {
-private:
-    SVGElement* clonedElement; // Guarda a cópia do elemento original
+// // escrevemos:
+// class Use : public SVGElement {
+// private:
+//     SVGElement* clonedElement; // Guarda a cópia do elemento original
 
-public:
-    Use(SVGElement* elem);
-    ~Use() override;
+// public:
+//     Use(SVGElement* elem);
+//     ~Use() override;
 
-    void draw(PNGImage& img) const override;
-    SVGElement* clone() const override;
-};
-}
+//     void draw(PNGImage& img) const override;
+//     SVGElement* clone() const override;
+// };
+// }
         //AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
         //provavel necessidade de mudar para este codigo
 namespace svg
