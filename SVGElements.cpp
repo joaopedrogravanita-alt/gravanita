@@ -1,6 +1,7 @@
 #include "SVGElements.hpp"
 #include <sstream>
 
+
 namespace svg
 {
     // These must be defined!
@@ -197,4 +198,55 @@ void Rect::draw(PNGImage &img) const
         //3
     }
 
+Group::Group() {}
+
+Group::~Group() {
+    // Como o grupo é dono dos seus elementos, temos de os apagar da memória
+    for (SVGElement* elem : elements) {
+        delete elem;
+    }
+    elements.clear();
+}
+
+void Group::addElement(SVGElement* elem) {
+    if (elem != nullptr) {
+        elements.push_back(elem);
+    }
+}
+
+void Group::draw(PNGImage& img) const {
+    // Um ciclo 'for' que percorre o vetor e desenha cada filho
+    for (SVGElement* elem : elements) {
+        elem->draw(img); 
+        // Nota: Se a transformação do grupo tiver de afetar os filhos, 
+        // a lógica de matrizes/transformações do motor tratará disso ou terá de ser aplicada aqui.
+    }
+}
+
+SVGElement* Group::clone() const {
+    Group* newGroup = new Group();
+    // Temos de fazer uma "cópia profunda" (deep copy) de todos os elementos lá dentro
+    for (SVGElement* elem : elements) {
+        newGroup->addElement(elem->clone());
+    }
+    return newGroup;
+}
+
+// escrevemos:
+Use::Use(SVGElement* elem) : clonedElement(elem) {}
+
+Use::~Use() {
+    delete clonedElement; // Apaga o elemento clonado associado a este 'use'
+}
+
+void Use::draw(PNGImage& img) const {
+    if (clonedElement != nullptr) {
+        clonedElement->draw(img);
+    }
+}
+
+SVGElement* Use::clone() const {
+    // Clona o 'use' e faz também um clone do elemento que ele aponta
+    return new Use(clonedElement->clone());
+}
 }
