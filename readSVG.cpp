@@ -137,7 +137,6 @@ namespace svg
 
         
     }
-BRUNO: VE ISTO AQUI
 using namespace tinyxml2;
 
 // Função auxiliar/recursiva para ler qualquer elemento SVG
