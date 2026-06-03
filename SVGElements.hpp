@@ -41,7 +41,7 @@ namespace svg
     class Ellipse : public SVGElement
     {
     public:
-        Ellipse(const Color &fill, const Point &center, const Point &radius);
+        Ellipse(const Color &fill, const Point &center, const Point &radius, const std::string &transform = "", const Point &origin = {0, 0});
         void draw(PNGImage &img) const override;
 
     private:
@@ -55,7 +55,7 @@ namespace svg
 class Circle : public SVGElement
 {
 public:
-    Circle( const Color &fill, const Point &center, const int &radius);
+    Circle( const Color &fill, const Point &center, const int &radius, const std::string &transform = "", const Point &origin = {0, 0});
     void draw(PNGImage &img) const override;
 private:
         Color fill;
@@ -67,7 +67,7 @@ class Polyline : public SVGElement
 {
 public:
     Polyline(const Color& stroke,
-             const std::vector<Point>& points);
+             const std::vector<Point>& points, const std::string &transform = "", const Point &origin = {0, 0});
 
     void draw(PNGImage& img) const override;
 
@@ -81,7 +81,7 @@ class Line : public SVGElement
 public:
     Line(const Color& stroke,
          const Point& p1,
-         const Point& p2);
+         const Point& p2, const std::string &transform = "", const Point &origin = {0, 0});
     void draw(PNGImage &img) const override;
 private:
         Color stroke;
@@ -95,7 +95,7 @@ class Polygon : public SVGElement
 {
 public:
     Polygon(const Color& fill,
-            const std::vector<Point>& points);
+            const std::vector<Point>& points, const std::string &transform = "", const Point &origin = {0, 0});
 
     void draw(PNGImage& img) const override;
 
@@ -110,7 +110,7 @@ public:
     Rect(const Color& fill,
          const Point& top_left,
          int width,
-         int height);
+         int height, const std::string &transform = "", const Point &origin = {0, 0});
     void draw(PNGImage &img) const override;
 private:
         Color fill;
