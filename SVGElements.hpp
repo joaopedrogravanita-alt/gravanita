@@ -20,7 +20,7 @@ namespace svg
         
         //3
     protected:
-        std::string transform_cmd;
+        std::string transform_;
         Point transform_origin;
 
         Point apply_transforms(Point p) const;
