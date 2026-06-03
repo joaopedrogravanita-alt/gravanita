@@ -27,19 +27,37 @@ namespace svg
         {
             string name = child->Value();
 
+            // 3
+            string transform = "";
+            const char* transform_attr = child->Attribute("transform");
+            if (transform_attr != nullptr)
+            {
+                transform = transform_attr;
+            }
+
+            Point transform_origin = {0, 0};
+            const char* origin_attr = child->Attribute("transform-origin");
+            if (origin_attr != nullptr)
+            {
+                stringstream ss(origin_attr);
+                ss >> transform_origin.x >> transform_origin.y;
+            }
+
+            //3
+
             if (name == "ellipse")
             {
                 Color fill = parse_color(child->Attribute("fill"));
                 Point center = { child->IntAttribute("cx"), child->IntAttribute("cy") };
                 Point radius = { child->IntAttribute("rx"), child->IntAttribute("ry") };
-                svg_elements.push_back(new Ellipse(fill, center, radius));
+                svg_elements.push_back(new Ellipse(fill, center, radius, transform, transform_origin)); //3
             }
             else if (name == "circle")
             {
                 Color fill = parse_color(child->Attribute("fill"));
                 Point center = { child->IntAttribute("cx"), child->IntAttribute("cy") };
                 int radius = child->IntAttribute("r");
-                svg_elements.push_back(new Circle(fill, center, radius));
+                svg_elements.push_back(new Circle(fill, center, radius, , transform, transform_origin));//3
             }
             else if (name == "line")
             {
@@ -48,7 +66,7 @@ namespace svg
                 Color stroke = stroke_attr ? parse_color(stroke_attr) : Color{0, 0, 0};
                 Point p1 = { child->IntAttribute("x1"), child->IntAttribute("y1") };
                 Point p2 = { child->IntAttribute("x2"), child->IntAttribute("y2") };
-                svg_elements.push_back(new Line(stroke, p1, p2));
+                svg_elements.push_back(new Line(stroke, p1, p2, transform, transform_origin)); //3
             }
             else if (name == "rect")
             {
@@ -56,7 +74,7 @@ namespace svg
                 Point topLeft = { child->IntAttribute("x"), child->IntAttribute("y") };
                 int width = child->IntAttribute("width");
                 int height = child->IntAttribute("height");
-                svg_elements.push_back(new Rect(fill, topLeft, width, height));
+                svg_elements.push_back(new Rect(fill, topLeft, width, height, , transform, transform_origin)); //3
             }
             else if (name == "polygon")
             {
@@ -80,7 +98,7 @@ namespace svg
                             points.push_back({px, py});
                         }
                     }
-                    svg_elements.push_back(new Polygon(fill, points));
+                    svg_elements.push_back(new Polygon(fill, points, transform, transform_origin));
                 }
             }
             else if (name == "polyline")
@@ -105,7 +123,7 @@ namespace svg
                             points.push_back({px, py});
                         }
                     }
-                    svg_elements.push_back(new Polyline(stroke, points));
+                    svg_elements.push_back(new Polyline(stroke, points , transform, transform_origin)); //3
                 }
             }
 
