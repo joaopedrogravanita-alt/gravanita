@@ -5,19 +5,19 @@ namespace svg
 {
     // These must be defined!
     SVGElement::SVGElement(const std::string &transform, const Point &origin)
-        : transform_cmd(transform), transform_origin(origin) {} //3
+        : transform_(transform), transform_origin(origin) {} //3
     SVGElement::~SVGElement() {}
 
 
     //3
 Point SVGElement::apply_transforms(Point p) const
     {
-        if (transform_cmd.empty()) {
+        if (transform_.empty()) {
             return p;
         }
 
-        size_t open_bracket = transform_cmd.find('(');
-        size_t close_bracket = transform_cmd.find(')');
+        size_t open_bracket = transform_.find('(');
+        size_t close_bracket = transform_.find(')');
          //procura na string o parêntesis de abertura e fecho, para o transform
         
         if (open_bracket == std::string::npos || close_bracket == std::string::npos) {
@@ -25,19 +25,19 @@ Point SVGElement::apply_transforms(Point p) const
         }
         // se não encontrar retorna p, que são as cordenadas do que seria transformado
 
-        std::string tipo = transform_cmd.substr(0, open_bracket);
+        std::string tipo = transform_.substr(0, open_bracket);
         // retira tudo o que está antes do 1 parêntesis, ou seja, o tipo de transformação que irá ocorrer
         
-        std::string args_str = transform_cmd.substr(open_bracket + 1, close_bracket - open_bracket - 1);
+        std::string argumento = transform_.substr(open_bracket + 1, close_bracket - open_bracket - 1);
         // agora retira apenas os dados
         
         
-        for (char &c : args_str) {
+        for (char &c : argumento) {
             if (c == ',') c = ' ';
         }
         // substitui as vírgulas por espaços, para que os dados sejam usados no s_tr_ing_stre_am
         
-        std::stringstream ss(args_str);
+        std::stringstream ss(argumento);
         //cria um novo ss para desenvolver um novo fluxo, entre os dados
 
         if (tipo == "translate")
