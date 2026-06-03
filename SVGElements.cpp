@@ -6,7 +6,11 @@ namespace svg
     // These must be defined!
     SVGElement::SVGElement(const std::string &transform, const Point &origin)
         : transform_(transform), transform_origin(origin) {} //3
+    //contrtutor
+
+
     SVGElement::~SVGElement() {}
+    //destrutor
 
 
     //3
@@ -176,7 +180,7 @@ Rect::Rect(const Color& fill,
            fill(fill), top_left(top_left), width(width), height(height) {}
 void Rect::draw(PNGImage &img) const
     {
-        // Mapeia os 4 cantos do retângulo (ajustando as dimensões com -1 para os limites do varrimento)
+        
         std::vector<Point> pts = {
             top_left,
             {top_left.x + width - 1, top_left.y},
