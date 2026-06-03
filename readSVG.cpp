@@ -29,17 +29,17 @@ namespace svg
 
             // 3
             string transform = "";
-            const char* transform_attr = child->Attribute("transform");
-            if (transform_attr != nullptr)
+            const char* tipo = child->Attribute("transform");
+            if (tipo != nullptr)
             {
-                transform = transform_attr;
+                transform = tipo;
             }
 
             Point transform_origin = {0, 0};
-            const char* origin_attr = child->Attribute("transform-origin");
-            if (origin_attr != nullptr)
+            const char* argumento = child->Attribute("transform-origin");
+            if (argumento != nullptr)
             {
-                stringstream ss(origin_attr);
+                stringstream ss(argumento);
                 ss >> transform_origin.x >> transform_origin.y;
             }
 
