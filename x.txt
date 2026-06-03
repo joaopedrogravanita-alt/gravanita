@@ -1,0 +1,91 @@
+g++ -std=c++11  -pedantic -Wall -Wuninitialized -Werror -g -fsanitize=address -fsanitize=undefined -c -o svgtopng.o svgtopng.cpp
+g++ -std=c++11  -pedantic -Wall -Wuninitialized -Werror -g -fsanitize=address -fsanitize=undefined -c -o external/tinyxml2/tinyxml2.o external/tinyxml2/tinyxml2.cpp
+g++ -std=c++11  -pedantic -Wall -Wuninitialized -Werror -g -fsanitize=address -fsanitize=undefined -c -o Color.o Color.cpp
+g++ -std=c++11  -pedantic -Wall -Wuninitialized -Werror -g -fsanitize=address -fsanitize=undefined -c -o Point.o Point.cpp
+g++ -std=c++11  -pedantic -Wall -Wuninitialized -Werror -g -fsanitize=address -fsanitize=undefined -c -o PNGImage.o PNGImage.cpp
+g++ -std=c++11  -pedantic -Wall -Wuninitialized -Werror -g -fsanitize=address -fsanitize=undefined -c -o SVGElements.o SVGElements.cpp
+SVGElements.cpp:18:11: error: no declaration matches ‘svg::Point svg::SVGElement::apply_transforms(svg::Point, const std::string&) const’
+   18 |     Point SVGElement::apply_transforms(Point p, const std::string &transform_str) const {
+      |           ^~~~~~~~~~
+SVGElements.cpp:18:11: note: no functions named ‘svg::Point svg::SVGElement::apply_transforms(svg::Point, const std::string&) const’
+In file included from SVGElements.cpp:1:
+SVGElements.hpp:23:11: note: ‘class svg::SVGElement’ defined here
+   23 |     class SVGElement
+      |           ^~~~~~~~~~
+SVGElements.cpp:64:10: error: no declaration matches ‘void svg::Ellipse::draw(svg::PNGImage&, const std::string&) const’
+   64 |     void Ellipse::draw(PNGImage &img, const std::string &pt) const {
+      |          ^~~~~~~
+SVGElements.hpp:43:14: note: candidate is: ‘virtual void svg::Ellipse::draw(svg::PNGImage&, svg::Matrix) const’
+   43 |         void draw(PNGImage &img, Matrix currentMatrix) const override;
+      |              ^~~~
+SVGElements.hpp:40:11: note: ‘class svg::Ellipse’ defined here
+   40 |     class Ellipse : public SVGElement {
+      |           ^~~~~~~
+SVGElements.cpp:69:10: error: no declaration matches ‘void svg::Circle::draw(svg::PNGImage&, const std::string&) const’
+   69 |     void Circle::draw(PNGImage &img, const std::string &pt) const {
+      |          ^~~~~~
+SVGElements.hpp:52:14: note: candidate is: ‘virtual void svg::Circle::draw(svg::PNGImage&, svg::Matrix) const’
+   52 |         void draw(PNGImage &img, Matrix currentMatrix) const override;
+      |              ^~~~
+SVGElements.hpp:49:11: note: ‘class svg::Circle’ defined here
+   49 |     class Circle : public SVGElement {
+      |           ^~~~~~
+SVGElements.cpp:74:10: error: no declaration matches ‘void svg::Polyline::draw(svg::PNGImage&, const std::string&) const’
+   74 |     void Polyline::draw(PNGImage& img, const std::string &pt) const {
+      |          ^~~~~~~~
+SVGElements.hpp:61:14: note: candidate is: ‘virtual void svg::Polyline::draw(svg::PNGImage&, svg::Matrix) const’
+   61 |         void draw(PNGImage& img, Matrix currentMatrix) const override;
+      |              ^~~~
+SVGElements.hpp:58:11: note: ‘class svg::Polyline’ defined here
+   58 |     class Polyline : public SVGElement {
+      |           ^~~~~~~~
+SVGElements.cpp:83:10: error: no declaration matches ‘void svg::Line::draw(svg::PNGImage&, const std::string&) const’
+   83 |     void Line::draw(PNGImage &img, const std::string &pt) const {
+      |          ^~~~
+SVGElements.hpp:70:14: note: candidate is: ‘virtual void svg::Line::draw(svg::PNGImage&, svg::Matrix) const’
+   70 |         void draw(PNGImage &img, Matrix currentMatrix) const override;
+      |              ^~~~
+SVGElements.hpp:67:11: note: ‘class svg::Line’ defined here
+   67 |     class Line : public SVGElement {
+      |           ^~~~
+SVGElements.cpp:90:10: error: no declaration matches ‘void svg::Polygon::draw(svg::PNGImage&, const std::string&) const’
+   90 |     void Polygon::draw(PNGImage& img, const std::string &pt) const {
+      |          ^~~~~~~
+SVGElements.hpp:79:14: note: candidate is: ‘virtual void svg::Polygon::draw(svg::PNGImage&, svg::Matrix) const’
+   79 |         void draw(PNGImage& img, Matrix currentMatrix) const override;
+      |              ^~~~
+SVGElements.hpp:76:11: note: ‘class svg::Polygon’ defined here
+   76 |     class Polygon : public SVGElement {
+      |           ^~~~~~~
+SVGElements.cpp:98:10: error: no declaration matches ‘void svg::Rect::draw(svg::PNGImage&, const std::string&) const’
+   98 |     void Rect::draw(PNGImage &img, const std::string &pt) const {
+      |          ^~~~
+SVGElements.hpp:88:14: note: candidate is: ‘virtual void svg::Rect::draw(svg::PNGImage&, svg::Matrix) const’
+   88 |         void draw(PNGImage &img, Matrix currentMatrix) const override;
+      |              ^~~~
+SVGElements.hpp:85:11: note: ‘class svg::Rect’ defined here
+   85 |     class Rect : public SVGElement {
+      |           ^~~~
+SVGElements.cpp:123:10: error: no declaration matches ‘void svg::Group::draw(svg::PNGImage&, const std::string&) const’
+  123 |     void Group::draw(PNGImage& img, const std::string &pt) const {
+      |          ^~~~~
+SVGElements.hpp:99:14: note: candidate is: ‘virtual void svg::Group::draw(svg::PNGImage&, svg::Matrix) const’
+   99 |         void draw(PNGImage& img, Matrix currentMatrix) const override;
+      |              ^~~~
+SVGElements.hpp:94:11: note: ‘class svg::Group’ defined here
+   94 |     class Group : public SVGElement {
+      |           ^~~~~
+SVGElements.cpp:137:10: error: no declaration matches ‘void svg::Use::draw(svg::PNGImage&, const std::string&) const’
+  137 |     void Use::draw(PNGImage& img, const std::string &pt) const {
+      |          ^~~
+SVGElements.hpp:110:14: note: candidate is: ‘virtual void svg::Use::draw(svg::PNGImage&, svg::Matrix) const’
+  110 |         void draw(PNGImage& img, Matrix currentMatrix) const override;
+      |              ^~~~
+SVGElements.hpp:106:11: note: ‘class svg::Use’ defined here
+  106 |     class Use : public SVGElement {
+      |           ^~~
+SVGElements.cpp:8:17: error: ‘bool svg::is_in_bounds(const Point&, int, int)’ defined but not used [-Werror=unused-function]
+    8 |     static bool is_in_bounds(const Point& p, int w, int h) {
+      |                 ^~~~~~~~~~~~
+cc1plus: all warnings being treated as errors
+make: *** [Makefile:26: SVGElements.o] Error 1

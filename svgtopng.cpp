@@ -1,6 +1,11 @@
 #include "SVGElements.hpp"
 #include <iostream>
 
+// Add this forward declaration so the compiler knows it exists
+namespace svg {
+    void convert(const std::string &svg_file, const std::string &png_file);
+}
+
 int main(int argc, char **argv)
 {
     if (argc != 3)
