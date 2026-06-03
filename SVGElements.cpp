@@ -18,39 +18,47 @@ Point SVGElement::apply_transforms(Point p) const
 
         size_t open_bracket = transform_cmd.find('(');
         size_t close_bracket = transform_cmd.find(')');
+         //procura na string o parêntesis de abertura e fecho, para o transform
+        
         if (open_bracket == std::string::npos || close_bracket == std::string::npos) {
             return p;
         }
+        // se não encontrar retorna p, que são as cordenadas do que seria transformado
 
-        std::string type = transform_cmd.substr(0, open_bracket);
-        std::string args_str = transform_cmd.substr(open_bracket + 1, close_bracket - open_bracket - 1);
+        std::string tipo = transform_cmd.substr(0, open_bracket);
+        // retira tudo o que está antes do 1 parêntesis, ou seja, o tipo de transformação que irá ocorrer
         
-        // Normaliza separadores substituindo vírgulas por espaços
+        std::string args_str = transform_cmd.substr(open_bracket + 1, close_bracket - open_bracket - 1);
+        // agora retira apenas os dados
+        
+        
         for (char &c : args_str) {
             if (c == ',') c = ' ';
         }
+        // substitui as vírgulas por espaços, para que os dados sejam usados no s_tr_ing_stre_am
         
         std::stringstream ss(args_str);
+        //cria um novo ss para desenvolver um novo fluxo, entre os dados
 
-        if (type == "translate")
-        {
+        if (tipo == "translate")
+        { // se for deste tipo.... 
             int tx = 0, ty = 0;
-            if (ss >> tx >> ty) {
+            if (ss >> tx >> ty) { // do fluxo enunciado extrai as duas variáveis e transforma-as
                 p = p.translate({tx, ty});
             }
         }
-        else if (type == "rotate")
+        else if (tipo == "rotate")
         {
-            int degrees = 0;
-            if (ss >> degrees) {
-                p = p.rotate(transform_origin, degrees);
+            int graus = 0;
+            if (ss >> graus) {
+                p = p.rotate(transform_origin, graus);
             }
         }
-        else if (type == "scale")
+        else if (tipo == "scale")
         {
-            int factor = 1;
-            if (ss >> factor) {
-                p = p.scale(transform_origin, factor);
+            int v = 1;
+            if (ss >> v) {
+                p = p.scale(transform_origin, v);
             }
         }
         return p;
