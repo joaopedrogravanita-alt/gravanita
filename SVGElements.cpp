@@ -5,14 +5,14 @@
 
 namespace svg
 {
-    // Clamp reajustado para aceitar limites dinâmicos da imagem e evitar asserts falhados
+    // Clamp 
     Point clamp(Point p, int w, int h) {
     return { std::max(0, std::min(w - 1, p.x)), std::max(0, std::min(h - 1, p.y)) };
     }
 
-    // ==========================================
+
     // MATRIX IMPLEMENTATIONS
-    // ==========================================
+
     Matrix Matrix::identity() { return Matrix(); }
 
     Matrix Matrix::multiply(const Matrix& other) const {
@@ -90,9 +90,9 @@ namespace svg
         return res;
     }
 
-    // ==========================================
+
     // SVGELEMENT BASE IMPLEMENTATIONS
-    // ==========================================
+
     SVGElement::SVGElement(const std::string &transform, const Point &origin)
         : transform_(transform), transform_origin(origin) {}
     SVGElement::~SVGElement() {}
@@ -101,9 +101,9 @@ namespace svg
         this->draw(img, Matrix::identity());
     }
 
-    // ==========================================
+
     // SHAPES IMPLEMENTATIONS WITH IMAGE BOUNDS PROTECTION
-    // ==========================================
+
     void Ellipse::draw(PNGImage &img, Matrix m) const {
         Matrix localM = Matrix::fromString(transform_, transform_origin);
         Matrix finalM = m.multiply(localM);
@@ -176,7 +176,7 @@ namespace svg
     Matrix localM = Matrix::fromString(transform_, transform_origin);
     Matrix finalM = m.multiply(localM);
     
-    // CORREÇÃO: Subtrair 1 para respeitar o intervalo inclusivo de píxeis [x, x + w - 1]
+    // CORRECTION
     std::vector<Point> pts = {
         top_left, 
         {top_left.x + width - 1, top_left.y}, 
@@ -186,9 +186,9 @@ namespace svg
     
     std::vector<Point> t_pts;
     for (const auto& p : pts) {
-        // Aplica a matriz de transformação
+        // applies transform matrix
         Point transformed = finalM.apply(p);
-        // Aplica o clamp para garantir que respeita o assert estrito do PNGImage.cpp
+        // applies clamp
         t_pts.push_back(clamp(transformed, img.width(), img.height()));
     }
     
@@ -203,9 +203,8 @@ namespace svg
 
     
 
-    // ==========================================
     // GROUP AND USE IMPLEMENTATIONS
-    // ==========================================
+
     Group::Group(const std::string &t, const Point &o) : SVGElement(t, o) {}
     Group::Group(const std::vector<SVGElement*> &elems, const std::string &t, const Point &o) 
         : SVGElement(t, o), elements(elems) {}
@@ -247,9 +246,9 @@ namespace svg
         return new Use(clonedElement->clone(), transform_, transform_origin); 
     }
 
-    // ==========================================
-    // CONSTRUCTORS & CLONES
-    // ==========================================
+
+    // CONSTRUCTORS AND CLONES
+
     Ellipse::Ellipse(const Color &f, const Point &c, const Point &r, const std::string &t, const Point &o) : SVGElement(t, o), fill(f), center(c), radius(r) {}
     SVGElement* Ellipse::clone() const { return new Ellipse(fill, center, radius, transform_, transform_origin); }
     Circle::Circle(const Color &f, const Point &c, const int &r, const std::string &t, const Point &o) : SVGElement(t, o), fill(f), center(c), radius(r) {}
