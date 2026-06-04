@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <iomanip>
 #include "SVGElements.hpp"
 #include "external/tinyxml2/tinyxml2.h"
 
@@ -11,14 +12,32 @@ using namespace tinyxml2;
 
 namespace svg
 {
-    // Helper to map string names to Color objects
+    // Helper to map string names and hex codes to Color objects
     Color stringToColor(const std::string& colorStr) {
+        if (colorStr.empty()) return Color{0, 0, 0};
+
+        // Hexadecimal color parsing (#RRGGBB)
+        if (colorStr[0] == '#') {
+            if (colorStr.length() == 7) {
+                int r, g, b;
+                std::stringstream ss;
+                ss << std::hex << colorStr.substr(1, 2); ss >> r;
+                ss.clear();
+                ss << std::hex << colorStr.substr(3, 2); ss >> g;
+                ss.clear();
+                ss << std::hex << colorStr.substr(5, 2); ss >> b;
+                return Color{(unsigned char)r, (unsigned char)g, (unsigned char)b};
+            }
+        }
+
+        // Named color mappings
         if (colorStr == "red")    return Color{255, 0, 0};
         if (colorStr == "blue")   return Color{0, 0, 255};
         if (colorStr == "green")  return Color{0, 255, 0};
         if (colorStr == "white")  return Color{255, 255, 255};
         if (colorStr == "black")  return Color{0, 0, 0};
         if (colorStr == "yellow") return Color{255, 255, 0};
+        
         return Color{0, 0, 0}; // Default
     }
 
@@ -32,11 +51,10 @@ namespace svg
         return points;
     }
     
-    // Improved parseOrigin to handle potential trailing characters or spaces
     Point parseOrigin(const char* attrStr) {
         if (!attrStr) return {0, 0};
         std::stringstream ss(attrStr);
-        double x = 0, y = 0; // Use double for internal precision before rounding
+        double x = 0, y = 0;
         ss >> x >> y;
         return {static_cast<int>(x), static_cast<int>(y)};
     }

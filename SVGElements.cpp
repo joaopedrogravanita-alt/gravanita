@@ -5,14 +5,12 @@
 
 namespace svg
 {
-    // --- Helper: Clamp coordinates to prevent out-of-bounds crashes ---
-    // Note: If you don't have access to PNGImage dimensions here, 
-    // you may need to hardcode the limit or pass it through.
-    Point clamp(Point p, int w = 530, int h = 530) {
+    // Updated clamp to use dimensions passed from the main image object
+    Point clamp(Point p, int w, int h) {
         return { std::max(0, std::min(w - 1, p.x)), std::max(0, std::min(h - 1, p.y)) };
     }
 
-    // --- Matrix Implementation ---
+    //MATRIZ IMPLEMENTATIONS
     Matrix Matrix::identity() { return Matrix(); }
 
     Matrix Matrix::multiply(const Matrix& other) const {
@@ -32,7 +30,9 @@ namespace svg
     }
 
     Matrix Matrix::fromString(const std::string& transform, Point origin) {
-        Matrix res;
+        Matrix res = Matrix::identity();
+        if (transform.empty()) return res;
+        
         std::stringstream ss(transform);
         std::string task;
         while (std::getline(ss, task, ')')) {
@@ -47,7 +47,7 @@ namespace svg
             if (type == "translate") {
                 double tx, ty; ss_args >> tx >> ty;
                 Matrix t; t.m[0][2] = tx; t.m[1][2] = ty;
-                res = t.multiply(res);
+                res = res.multiply(t);
             } else if (type == "rotate") {
                 double deg; ss_args >> deg;
                 double rad = M_PI * deg / 180.0;
@@ -55,17 +55,22 @@ namespace svg
                 r.m[0][0] = cos(rad); r.m[0][1] = -sin(rad); r.m[1][0] = sin(rad); r.m[1][1] = cos(rad);
                 Matrix toOrig; toOrig.m[0][2] = -origin.x; toOrig.m[1][2] = -origin.y;
                 Matrix fromOrig; fromOrig.m[0][2] = origin.x; fromOrig.m[1][2] = origin.y;
-                res = fromOrig.multiply(r.multiply(toOrig.multiply(res)));
+                res = res.multiply(fromOrig.multiply(r.multiply(toOrig)));
             } else if (type == "scale") {
                 double s; ss_args >> s;
                 Matrix sc; sc.m[0][0] = s; sc.m[1][1] = s;
-                res = sc.multiply(res);
+                
+                // Centered scale transformation
+                Matrix toOrig; toOrig.m[0][2] = -origin.x; toOrig.m[1][2] = -origin.y;
+                Matrix fromOrig; fromOrig.m[0][2] = origin.x; fromOrig.m[1][2] = origin.y;
+                
+                res = res.multiply(fromOrig.multiply(sc.multiply(toOrig)));
             }
         }
         return res;
     }
 
-    // --- SVGElements Implementation ---
+    //SVGELEMENT IMPLEMENTATIONS
     SVGElement::SVGElement(const std::string &transform, const Point &origin)
         : transform_(transform), transform_origin(origin) {}
     SVGElement::~SVGElement() {}
@@ -74,33 +79,35 @@ namespace svg
         this->draw(img, Matrix::identity());
     }
 
+    SHAPE IMPLEMENTATIONS
     void Ellipse::draw(PNGImage &img, Matrix m) const {
         Matrix finalM = m.multiply(Matrix::fromString(transform_, transform_origin));
-        // Clamp the center point
-        img.draw_ellipse(clamp(finalM.apply(center)), {radius.x, radius.y}, fill);
+        img.draw_ellipse(clamp(finalM.apply(center), img.width(), img.height()), {radius.x, radius.y}, fill);
     }
 
     void Circle::draw(PNGImage &img, Matrix m) const {
         Matrix finalM = m.multiply(Matrix::fromString(transform_, transform_origin));
-        img.draw_ellipse(clamp(finalM.apply(center)), {radius, radius}, fill);
+        img.draw_ellipse(clamp(finalM.apply(center), img.width(), img.height()), {radius, radius}, fill);
     }
 
     void Polyline::draw(PNGImage &img, Matrix m) const {
         Matrix finalM = m.multiply(Matrix::fromString(transform_, transform_origin));
         for (size_t i = 1; i < points.size(); i++) {
-            img.draw_line(clamp(finalM.apply(points[i-1])), clamp(finalM.apply(points[i])), stroke);
+            img.draw_line(clamp(finalM.apply(points[i-1]), img.width(), img.height()), 
+                          clamp(finalM.apply(points[i]), img.width(), img.height()), stroke);
         }
     }
 
     void Line::draw(PNGImage &img, Matrix m) const {
         Matrix finalM = m.multiply(Matrix::fromString(transform_, transform_origin));
-        img.draw_line(clamp(finalM.apply(p1)), clamp(finalM.apply(p2)), stroke);
+        img.draw_line(clamp(finalM.apply(p1), img.width(), img.height()), 
+                      clamp(finalM.apply(p2), img.width(), img.height()), stroke);
     }
 
     void Polygon::draw(PNGImage &img, Matrix m) const {
         Matrix finalM = m.multiply(Matrix::fromString(transform_, transform_origin));
         std::vector<Point> t_pts;
-        for (const auto& p : points) t_pts.push_back(clamp(finalM.apply(p)));
+        for (const auto& p : points) t_pts.push_back(clamp(finalM.apply(p), img.width(), img.height()));
         img.draw_polygon(t_pts, fill);
     }
 
@@ -108,25 +115,21 @@ namespace svg
         Matrix finalM = m.multiply(Matrix::fromString(transform_, transform_origin));
         std::vector<Point> pts = {top_left, {top_left.x + width, top_left.y}, {top_left.x + width, top_left.y + height}, {top_left.x, top_left.y + height}};
         std::vector<Point> t_pts;
-        for (const auto& p : pts) t_pts.push_back(clamp(finalM.apply(p)));
+        for (const auto& p : pts) t_pts.push_back(clamp(finalM.apply(p), img.width(), img.height()));
         img.draw_polygon(t_pts, fill);
     }
 
-    // Group and Use classes
+    //GROUP AND USE
     Group::Group(const std::string &t, const Point &o) : SVGElement(t, o) {}
     Group::Group(const std::vector<SVGElement*> &elems, const std::string &t, const Point &o) : SVGElement(t, o), elements(elems) {}
     Group::~Group() { for (auto e : elements) delete e; }
+    
     void Group::draw(PNGImage &img, Matrix m) const {
-    // 1. Calculate the local transformation for this group
-    Matrix localM = Matrix::fromString(transform_, transform_origin);
+        Matrix localM = Matrix::fromString(transform_, transform_origin);
+        Matrix groupM = m.multiply(localM); 
+        for (auto child : elements) child->draw(img, groupM);
+    }
     
-    // 2. Multiply the incoming matrix by the local matrix (Order matters!)
-    // If the previous order was causing drift, try reversing:
-    Matrix groupM = m.multiply(localM); 
-    
-    // 3. Pass the new accumulated matrix to all children
-    for (auto child : elements) child->draw(img, groupM);
-}
     SVGElement* Group::clone() const {
         std::vector<SVGElement*> cloned;
         for (auto e : elements) cloned.push_back(e->clone());
@@ -136,13 +139,14 @@ namespace svg
 
     Use::Use(SVGElement* elem, const std::string &t, const Point &o) : SVGElement(t, o), clonedElement(elem) {}
     Use::~Use() { delete clonedElement; }
+    
     void Use::draw(PNGImage &img, Matrix m) const {
         Matrix useM = m.multiply(Matrix::fromString(transform_, transform_origin));
         clonedElement->draw(img, useM);
     }
     SVGElement* Use::clone() const { return new Use(clonedElement->clone(), transform_, transform_origin); }
 
-    // Boilerplate Clones
+    //CONSTRUCTORS
     Ellipse::Ellipse(const Color &f, const Point &c, const Point &r, const std::string &t, const Point &o) : SVGElement(t, o), fill(f), center(c), radius(r) {}
     SVGElement* Ellipse::clone() const { return new Ellipse(fill, center, radius, transform_, transform_origin); }
     Circle::Circle(const Color &f, const Point &c, const int &r, const std::string &t, const Point &o) : SVGElement(t, o), fill(f), center(c), radius(r) {}
